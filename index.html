@@ -435,6 +435,33 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 .form-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-5); }
 
 /* ==========================================================================
+   BRIEFING POPUP
+   ========================================================================== */
+.briefing-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 37, 64, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  z-index: 60;
+}
+.briefing-backdrop[hidden] { display: none; }
+.briefing {
+  background: var(--white);
+  border-radius: var(--radius);
+  border-top: 4px solid var(--blue-600);
+  width: 100%;
+  max-width: 420px;
+  padding: var(--space-5) var(--space-6) var(--space-5);
+  box-shadow: 0 16px 40px rgba(10, 37, 64, 0.4);
+}
+.briefing h2 { margin: 0 0 var(--space-3); font-family: var(--font-serif); color: var(--blue-900); font-size: 22px; }
+.briefing p { margin: 0 0 var(--space-2); color: var(--grey-700); }
+.briefing .form-actions { margin-top: var(--space-4); }
+
+/* ==========================================================================
    TOASTS
    ========================================================================== */
 .toast-region {
@@ -602,6 +629,18 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
         <button type="submit" class="btn" id="submit-btn">Add Task</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ======================= BRIEFING POPUP ======================= -->
+<div class="briefing-backdrop" id="briefing-popup" hidden>
+  <div class="briefing" role="dialog" aria-modal="true" aria-labelledby="briefing-title">
+    <h2 id="briefing-title">IT Project Briefing</h2>
+    <p><strong>When:</strong> Wednesday 14 October 2026, 2:00 PM</p>
+    <p><strong>Where:</strong> Town Hall Meeting Room</p>
+    <div class="form-actions">
+      <button type="button" class="btn" id="briefing-close">Got it</button>
+    </div>
   </div>
 </div>
 
@@ -1139,6 +1178,15 @@ populateSelects();
 seedTasks();
 wireEvents();
 renderBoard();
+
+// Briefing popup: shown once, after the visitor has stayed on the page for 10 seconds
+const BRIEFING_DELAY_MS = 10000;
+const briefing = document.getElementById("briefing-popup");
+function closeBriefing() { briefing.hidden = true; }
+document.getElementById("briefing-close").addEventListener("click", closeBriefing);
+briefing.addEventListener("click", e => { if (e.target === briefing) closeBriefing(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !briefing.hidden) closeBriefing(); });
+setTimeout(() => { briefing.hidden = false; document.getElementById("briefing-close").focus(); }, BRIEFING_DELAY_MS);
 </script>
 </body>
 </html>

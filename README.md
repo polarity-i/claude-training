@@ -16,6 +16,7 @@ A single-file Kanban board for an IT PMO at a fictitious bank. It is an internal
 - **Portfolio statement** dashboard: an overall verdict (On track, Watch or At risk), a status ring with percent complete, a per-project ledger with status bars and overdue flags, and the next deadlines
 - Overdue badge and red due date on late cards
 - Email notification for each new task through [FormSubmit](https://formsubmit.co)
+- IT Project Briefing popup (Wed 14 Oct 2026, 2pm, Town Hall Meeting Room) shown after 10 seconds on the page; a project hook in `.claude/hooks/` checks it stays intact
 
 ## Tech and constraints
 
