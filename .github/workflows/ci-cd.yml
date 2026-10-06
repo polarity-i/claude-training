@@ -1,0 +1,75 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: index.html exists
+        run: test -s index.html
+
+      - name: Check project constraints
+        run: |
+          fail=0
+          for pat in 'localStorage' 'sessionStorage' 'indexedDB' 'document\.cookie' 'alert(' 'confirm(' '!important'; do
+            if grep -n -- "$pat" index.html; then
+              echo "::error::Forbidden pattern in index.html: $pat"
+              fail=1
+            fi
+          done
+          if grep -nE '(src|href)=["'"'"']https?://|url\(["'"'"']?https?://' index.html; then
+            echo "::error::External resource referenced in index.html"
+            fail=1
+          fi
+          exit $fail
+
+      - name: Secret scan
+        run: |
+          if grep -rnE --exclude-dir=.git 'AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----' .; then
+            echo "::error::Possible secret found"
+            exit 1
+          fi
+
+      - name: Syntax-check inline script
+        run: |
+          awk '/<script>/{f=1;next} /<\/script>/{f=0} f' index.html > script.js
+          node --check script.js
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stage site
+        run: |
+          mkdir _site
+          cp index.html _site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
