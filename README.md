@@ -6,6 +6,8 @@ A single-file Kanban board for an IT PMO at a fictitious bank. It is an internal
 
 **Live demo:** https://polarity-i.github.io/claude-training/
 
+![IT PMO Project Board screenshot](docs/screenshot.png)
+
 ## Features
 
 - Four columns: **Backlog**, **In Progress**, **Blocked**, **Done**
@@ -41,6 +43,7 @@ A GitHub Actions workflow (`.github/workflows/ci-cd.yml`) validates `index.html`
 
 ```
 index.html                       the whole app
+docs/screenshot.png              board screenshot used in this README
 CLAUDE.md                        project guidance for Claude Code
 .github/workflows/ci-cd.yml      CI checks and Pages deployment
 .claude/commands/                custom Claude Code commands

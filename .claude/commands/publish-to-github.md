@@ -1,7 +1,7 @@
 ---
 description: Security-scan, then publish this project to GitHub (push, README, Pages, CI/CD workflow, About section)
 argument-hint: <github-repo-url>
-allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
+allowed-tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_close
 ---
 
 Publish this project to the GitHub repository given in `$ARGUMENTS`.
@@ -26,23 +26,38 @@ Nothing leaves the machine until this passes. Scan the working tree **and** git 
 3. **Project-specific rules** (from `CLAUDE.md`):
    - The notification email address must appear **only** inside `FORMSUBMIT_ENDPOINT`. Any other occurrence is a failure. Note that the endpoint itself is public once pushed: FormSubmit endpoints are visible in page source by design, so tell the user plainly that the address will be public and let them decide (consider FormSubmit's random-token alias URL as an alternative).
    - No `localStorage`, `sessionStorage`, `IndexedDB`, `document.cookie`, `alert(`, `confirm(`, `!important`, and no external `http(s)://` resources (CDN, fonts, images) other than the FormSubmit endpoint.
-4. **Fix before continuing.** Add a `.gitignore` (at minimum: `.DS_Store`, `.env*`, `*.pem`, `*.key`, `node_modules/`, `.claude/settings.local.json`, `_site/`). If a file is tracked but should be ignored, `git rm --cached` it.
+4. **Fix before continuing.** Add a `.gitignore` (at minimum: `.DS_Store`, `.env*`, `*.pem`, `*.key`, `node_modules/`, `.claude/settings.local.json`, `_site/`, `.playwright-mcp/`). If a file is tracked but should be ignored, `git rm --cached` it.
 5. **Report** findings as a table (file:line, pattern, severity) without printing the secret values themselves (mask them). 
    - If anything sensitive is found in **history**, do not push. Explain the options (rewrite history with `git filter-repo`, or publish from a fresh history) and ask the user how to proceed. Rotate-the-credential advice always applies.
    - If the tree is clean, say so and continue.
 
-## Step 2: README
+## Step 2: Screenshot and README
+
+### 2a: Capture a screenshot with the Playwright MCP
+
+Refresh `docs/screenshot.png` so the README shows the current board. Use the Playwright MCP tools (`mcp__playwright__*`; load them with ToolSearch if they are deferred). If they are unavailable, say so and keep the existing screenshot rather than failing the publish.
+
+1. `file:` URLs are blocked by Playwright, so serve the project folder temporarily: run `python3 -m http.server 8765 --bind 127.0.0.1` from the project root in the background (use `run_in_background`).
+2. `browser_navigate` to `http://127.0.0.1:8765/index.html`, then `browser_resize` to 1280×800.
+3. `browser_take_screenshot` with `type: png` and `filename: docs/screenshot.png`, viewport only, on the untouched seed board (no filters, no moved or deleted cards).
+4. Read the image to check that the board rendered with all four columns, then `browser_close`.
+5. Clean up: stop the server (`pkill -f "http.server 8765"`) and delete the `.playwright-mcp/` output folder. Make sure `.playwright-mcp/` is in `.gitignore`.
+
+The screenshot is documentation only. It is never loaded by `index.html`, so the "no image files" app constraint is unaffected, and the deploy job still publishes only `index.html`.
+
+### 2b: README
 
 Create or update `README.md` (if one exists, preserve user-written content and edit rather than overwrite). Include:
 
 - Title and a one-line description (IT PMO Kanban board for a fictitious bank, demo/training tool).
 - Live demo link: `https://<owner>.github.io/<repo>/` and CI status badge: `![CI/CD](https://github.com/<owner>/<repo>/actions/workflows/ci-cd.yml/badge.svg)`.
+- The screenshot, right under the live demo link: `![IT PMO Project Board screenshot](docs/screenshot.png)` (relative path, so it renders on the repo page).
 - Features: four-column board (statuses), add/move/delete tasks, drag and drop, filters and summary, overdue badges, FormSubmit notification on new tasks.
 - Tech and constraints: single-file vanilla HTML/CSS/JS, no build, no dependencies, no external resources, no persistence (refresh resets the board).
 - Run locally: `open index.html`.
 - FormSubmit note: one-time email activation is required before notifications are delivered; until then a warning toast is expected.
 - Deployment: GitHub Actions deploys to GitHub Pages on every push to `main`.
-- Project structure and licence/disclaimer (fictitious data, demo only).
+- Project structure (including `docs/screenshot.png`) and licence/disclaimer (fictitious data, demo only).
 
 Derive facts from `index.html` and `CLAUDE.md`; do not invent features.
 
