@@ -20,7 +20,7 @@ There is no build, lint or test tooling, and no package manager. To run it, open
 ## Architecture
 
 - **State is the single source of truth.** `state = { tasks, filters }` holds the data. Transient UI state lives in module-level lets (`confirmingDeleteId`, `draggedId`, `idCounter`).
-- **Render from state.** `renderBoard()` rebuilds every column's card list and calls `renderSummary()`. `renderCard()` returns HTML strings. Do not mutate card DOM directly. Change state, then call `renderBoard()`.
+- **Render from state.** `renderBoard()` rebuilds every column's card list and calls `renderDashboard()`. `renderCard()` returns HTML strings. Do not mutate card DOM directly. Change state, then call `renderBoard()`.
 - **Mutations** are `addTask`, `moveTask` and `deleteTask`. All of them re-render.
 - **Event delegation.** The board has one set of listeners (click/change for delete and move, plus the drag events), so listeners survive re-renders. Cards and controls are found through `data-action` and `data-id`. The columns carry `data-status`, which is the drop target value.
 - **Escaping.** Every user-supplied string must go through `escapeHtml()` before it enters an HTML string. Tests such as `isOverdue` compare ISO `YYYY-MM-DD` strings directly.

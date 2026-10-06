@@ -21,15 +21,25 @@
   --grey-900: #1d2733;
   --grey-700: #44505e;
   --grey-500: #6b7785;
+  --grey-400: #8793a1;
   --grey-300: #c5ccd5;
+  --grey-200: #dde3ea;
   --grey-100: #eef1f4;
   --white:    #ffffff;
+
+  --canvas: #e9eef5;
 
   /* Semantic colours (priority / status signals only) */
   --red-600:   #c62828;
   --red-100:   #fde7e7;
   --amber-600: #d98200;
   --amber-100: #fff1d6;
+
+  /* One colour per workflow status: header bar, column rule, summary swatch */
+  --st-backlog: #6f86a6;
+  --st-in-progress: #2f74c8;
+  --st-blocked: #d98200;
+  --st-done: #b9cfea;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -38,9 +48,11 @@
   --space-5: 24px;
   --space-6: 32px;
 
-  --radius: 6px;
-  --shadow: 0 1px 3px rgba(10, 37, 64, 0.18);
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(10, 37, 64, 0.08), 0 0 0 1px rgba(10, 37, 64, 0.06);
+  --shadow-lift: 0 6px 16px rgba(10, 37, 64, 0.14), 0 0 0 1px rgba(10, 37, 64, 0.08);
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
 }
 
 /* ==========================================================================
@@ -52,9 +64,9 @@ body {
   margin: 0;
   font-family: var(--font);
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--grey-900);
-  background: var(--blue-50);
+  background: var(--canvas);
 }
 
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -73,61 +85,144 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* ==========================================================================
-   HEADER + SUMMARY STRIP
+   HEADER: engraved hero with guilloche rings (pure CSS), wordmark, add button
    ========================================================================== */
 .app-header {
-  background: var(--blue-900);
   color: var(--white);
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-5) var(--space-6) 104px;
+  background-color: var(--blue-900);
+  background-image:
+    repeating-radial-gradient(circle at 88% 130%, transparent 0 9px, rgba(143, 182, 230, 0.16) 9px 10px),
+    repeating-radial-gradient(circle at 72% -50%, transparent 0 13px, rgba(143, 182, 230, 0.12) 13px 14px),
+    linear-gradient(100deg, var(--blue-900) 35%, var(--blue-800));
+}
+
+.header-top {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-4);
 }
 
 .wordmark {
-  font-size: 22px;
+  font-family: var(--font-serif);
+  font-size: 34px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.01em;
+  line-height: 1;
   margin: 0;
 }
-.wordmark span { color: var(--blue-300); }
+.wordmark-sub {
+  display: block;
+  margin-top: var(--space-2);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--blue-300);
+}
 
-.summary {
+.header-actions { display: flex; align-items: center; gap: var(--space-4); }
+.demo-note { font-size: 12px; color: var(--blue-300); max-width: 26ch; text-align: right; }
+
+/* ==========================================================================
+   DASHBOARD: "Portfolio statement" sheet overlapping the hero
+   ========================================================================== */
+.dashboard {
+  position: relative;
+  margin: -72px var(--space-6) 0;
+  background: var(--white);
+  border-radius: var(--radius);
+  border-top: 4px solid var(--blue-600);
+  box-shadow: var(--shadow-lift);
+}
+.statement-head {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
   gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  flex: 1 1 auto;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--grey-200);
 }
-.summary li {
-  background: var(--blue-800);
-  border: 1px solid var(--blue-700);
-  border-radius: var(--radius);
-  padding: var(--space-1) var(--space-3);
+.statement-head h2 { margin: 0; font-family: var(--font-serif); font-size: 20px; color: var(--blue-900); }
+.statement-head span { font-size: 12px; color: var(--grey-500); }
+
+.dash-grid { display: grid; grid-template-columns: minmax(250px, 1fr) minmax(0, 2fr) minmax(250px, 1fr); }
+.dash-panel { padding: var(--space-5); min-width: 0; }
+.dash-panel + .dash-panel { border-left: 1px solid var(--grey-200); }
+.dash-panel h3 { margin: 0 0 var(--space-3); font-size: 13px; font-weight: 600; color: var(--grey-700); }
+
+/* Verdict + ring */
+.verdict {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.verdict::before { content: ""; flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--blue-500); }
+.verdict-watch { color: #8a5200; }
+.verdict-watch::before { background: var(--amber-600); }
+.verdict-risk { color: var(--red-600); }
+.verdict-risk::before { background: var(--red-600); }
+.verdict-ok { color: var(--blue-700); }
+.verdict-note { margin: var(--space-2) 0 var(--space-4); font-size: 13px; color: var(--grey-700); max-width: 34ch; }
+
+.ring-wrap { position: relative; width: 148px; height: 148px; }
+.ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 14; }
+.ring .ring-track { stroke: var(--grey-100); }
+.ring-center {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 72px;
+  justify-content: center;
 }
-.summary .num { font-size: 18px; font-weight: 700; }
-.summary .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--blue-100); }
-.summary .overdue-stat .num { color: #ffb4b4; }
+.ring-pct { font-family: var(--font-serif); font-size: 34px; font-weight: 700; line-height: 1; color: var(--blue-900); font-variant-numeric: tabular-nums; }
+.ring-cap { font-size: 12px; color: var(--grey-500); }
 
-.header-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-1);
-}
-.demo-note { font-size: 11px; color: var(--blue-100); }
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); list-style: none; margin: var(--space-4) 0 0; padding: 0; font-size: 12px; color: var(--grey-700); }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.legend .swatch { width: 10px; height: 10px; border-radius: 2px; }
+.legend b { font-variant-numeric: tabular-nums; }
+
+/* Project ledger */
+.ledger { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+.ledger-line { display: flex; align-items: baseline; gap: var(--space-2); font-size: 14px; }
+.ledger-name { font-weight: 600; color: var(--blue-900); }
+.ledger-dots { flex: 1 1 auto; border-bottom: 2px dotted var(--grey-300); transform: translateY(-3px); min-width: 16px; }
+.ledger-count { font-size: 12px; color: var(--grey-700); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ledger-flag { font-size: 11px; font-weight: 600; color: var(--white); background: var(--red-600); border-radius: var(--radius); padding: 0 var(--space-2); white-space: nowrap; }
+.ledger-bar { display: flex; gap: 2px; height: 10px; margin-top: 6px; background: var(--grey-100); border-radius: 2px; overflow: hidden; }
+.ledger-bar span { display: block; min-width: 0; }
+.seg-backlog     { background: var(--st-backlog); }
+.seg-in-progress { background: var(--st-in-progress); }
+.seg-blocked     { background: var(--st-blocked); }
+.seg-done        { background: var(--st-done); }
+.ledger-idle .ledger-name { color: var(--grey-500); font-weight: 400; }
+
+/* Due next */
+.due-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.due-list li { padding: var(--space-3) 0; border-bottom: 1px solid var(--grey-100); }
+.due-list li:first-child { padding-top: 0; }
+.due-list li:last-child { border-bottom: 0; }
+.due-title { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.due-meta { display: flex; justify-content: space-between; gap: var(--space-2); margin-top: 2px; font-size: 12px; color: var(--grey-500); }
+.due-when { font-weight: 600; color: var(--grey-700); white-space: nowrap; }
+.due-when.is-overdue { color: var(--red-600); }
+.dash-empty { font-size: 13px; color: var(--grey-500); margin: 0; }
 
 /* ==========================================================================
    BUTTONS
    ========================================================================== */
 .btn {
+  white-space: nowrap;
   border: 1px solid var(--blue-600);
   background: var(--blue-600);
   color: var(--white);
@@ -135,28 +230,31 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border-radius: var(--radius);
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 .btn:hover { background: var(--blue-700); }
 .btn:disabled { opacity: 0.65; cursor: progress; }
-.btn-secondary { background: var(--white); color: var(--blue-700); }
-.btn-secondary:hover { background: var(--blue-50); }
+.btn-secondary { background: var(--white); color: var(--blue-700); border-color: var(--grey-300); }
+.btn-secondary:hover { background: var(--blue-50); border-color: var(--blue-300); }
 .app-header .btn { background: var(--white); color: var(--blue-900); border-color: var(--white); }
-.app-header .btn:hover { background: var(--blue-100); }
+.app-header .btn:hover { background: var(--blue-100); border-color: var(--blue-100); }
 
 /* ==========================================================================
    FILTER BAR
    ========================================================================== */
 .filters {
+  margin-top: var(--space-5);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-4);
   align-items: flex-end;
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3) var(--space-6);
   background: var(--white);
-  border-bottom: 1px solid var(--blue-100);
+  border-bottom: 1px solid var(--grey-200);
 }
 .filters .field { display: flex; flex-direction: column; gap: var(--space-1); }
 .filters label { font-size: 12px; font-weight: 600; color: var(--grey-700); }
+.filters .btn { margin-left: auto; }
 
 /* ==========================================================================
    FORM CONTROLS
@@ -164,10 +262,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 input[type="text"], input[type="date"], select, textarea {
   border: 1px solid var(--grey-300);
   border-radius: var(--radius);
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   background: var(--white);
   min-width: 0;
 }
+input[type="text"]:hover, input[type="date"]:hover, select:hover, textarea:hover { border-color: var(--grey-400); }
 input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] {
   border-color: var(--red-600);
   background: var(--red-100);
@@ -181,46 +280,53 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
    ========================================================================== */
 .board {
   display: flex;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5) var(--space-6);
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-6) var(--space-6);
   align-items: flex-start;
 }
 
 .column {
   flex: 1 1 0;
   min-width: 0;
-  background: var(--blue-100);
-  border: 2px solid transparent;
-  border-radius: var(--radius);
-  padding: var(--space-3);
+  border-top: 3px solid var(--grey-400);
+  padding: var(--space-3) var(--space-1) var(--space-3);
   min-height: 180px;
+  border-radius: 0 0 var(--radius) var(--radius);
 }
+.column[data-status="Backlog"]     { border-top-color: var(--st-backlog); }
+.column[data-status="In Progress"] { border-top-color: var(--st-in-progress); }
+.column[data-status="Blocked"]     { border-top-color: var(--st-blocked); }
+.column[data-status="Done"]        { border-top-color: var(--st-done); }
 .column.drop-target {
-  border-color: var(--blue-500);
-  background: #cfe0f6;
-  border-style: dashed;
+  background: rgba(47, 116, 200, 0.1);
+  outline: 2px dashed var(--blue-500);
+  outline-offset: 4px;
 }
 
 .column-header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: var(--space-3);
 }
-.column-header h2 { margin: 0; font-size: 15px; color: var(--blue-900); }
+.column-header h2 { margin: 0; font-family: var(--font-serif); font-size: 19px; font-weight: 700; color: var(--blue-900); }
 .count-badge {
-  background: var(--blue-700);
-  color: var(--white);
-  border-radius: 999px;
-  min-width: 24px;
-  text-align: center;
-  padding: 1px var(--space-2);
-  font-size: 12px;
+  font-family: var(--font-serif);
+  font-size: 19px;
   font-weight: 700;
+  color: var(--grey-500);
+  font-variant-numeric: tabular-nums;
 }
-.column-hint { font-size: 11px; color: var(--grey-500); margin: 0 0 var(--space-3); }
+.column-hint { font-size: 12px; color: var(--grey-500); margin: var(--space-1) 0 var(--space-4); }
 .card-list { display: flex; flex-direction: column; gap: var(--space-3); min-height: 40px; }
-.empty-note { color: var(--grey-500); font-size: 12px; text-align: center; padding: var(--space-4) 0; margin: 0; }
+.empty-note {
+  color: var(--grey-500);
+  font-size: 12px;
+  text-align: center;
+  padding: var(--space-5) 0;
+  margin: 0;
+  border: 1px dashed var(--grey-300);
+  border-radius: var(--radius);
+}
 
 /* ==========================================================================
    CARDS
@@ -228,47 +334,62 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 .card {
   background: var(--white);
   border-radius: var(--radius);
-  border-left: 5px solid var(--grey-500);
   box-shadow: var(--shadow);
-  padding: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   cursor: grab;
+  transition: box-shadow 0.15s ease;
 }
-.card.dragging { opacity: 0.45; }
-.card.prio-critical { border-left-color: var(--red-600); }
-.card.prio-high     { border-left-color: var(--amber-600); }
-.card.prio-medium   { border-left-color: var(--blue-500); }
-.card.prio-low      { border-left-color: var(--grey-500); }
+.card:hover { box-shadow: var(--shadow-lift); }
+.card.dragging { opacity: 0.4; }
 
 .card-top { display: flex; align-items: center; gap: var(--space-2); }
-.task-id { font-size: 11px; font-weight: 700; color: var(--blue-700); letter-spacing: 0.03em; }
+.task-id { font-size: 11px; font-weight: 600; color: var(--grey-500); font-variant-numeric: tabular-nums; }
 .card-spacer { flex: 1 1 auto; }
 
-.card-title { margin: var(--space-2) 0 var(--space-1); font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
-.card-project { margin: 0; font-size: 12px; color: var(--grey-700); }
-.card-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2); margin: var(--space-2) 0; font-size: 12px; color: var(--grey-700); }
+.prio { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--grey-700); }
+.prio::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--grey-400); }
+.prio-critical::before { background: var(--red-600); }
+.prio-high::before     { background: var(--amber-600); }
+.prio-medium::before   { background: var(--blue-500); }
+.prio-low::before      { background: var(--grey-400); }
+.prio-critical { color: var(--red-600); }
+
+.card-title { margin: var(--space-2) 0 var(--space-1); font-size: 15px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.card-project { margin: 0; font-size: 12px; color: var(--grey-500); }
+.card-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin: var(--space-3) 0 var(--space-2); font-size: 12px; color: var(--grey-700); }
+.assignee { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; }
+.avatar {
+  flex: none;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--blue-100);
+  color: var(--blue-800);
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.due.is-overdue { color: var(--red-600); font-weight: 600; }
 .card-tags { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
 
-.pill, .tag, .badge-overdue {
+.tag, .badge-overdue {
   display: inline-block;
-  border-radius: 999px;
+  border-radius: var(--radius);
   padding: 1px var(--space-2);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
-.pill-critical { background: var(--red-100);   color: var(--red-600);   border: 1px solid var(--red-600); }
-.pill-high     { background: var(--amber-100); color: #8a5200;          border: 1px solid var(--amber-600); }
-.pill-medium   { background: var(--blue-100);  color: var(--blue-700);  border: 1px solid var(--blue-500); }
-.pill-low      { background: var(--grey-100);  color: var(--grey-700);  border: 1px solid var(--grey-500); }
-.tag { background: var(--blue-50); color: var(--blue-800); border: 1px solid var(--blue-300); font-weight: 600; }
-.badge-overdue { background: var(--red-100); color: var(--red-600); font-weight: 600; }
+.tag { background: var(--blue-50); color: var(--blue-800); }
+.badge-overdue { background: var(--red-600); color: var(--white); }
 
-.card-actions { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); margin-top: var(--space-3); }
-.move-select { font-size: 12px; padding: var(--space-1); }
+.card-actions { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--grey-100); }
+.move-select { font-size: 12px; padding: var(--space-1) var(--space-2); color: var(--grey-700); }
 
 .icon-btn {
   border: 0;
   background: transparent;
-  color: var(--grey-500);
+  color: var(--grey-400);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -287,11 +408,11 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(10, 37, 64, 0.55);
+  background: rgba(10, 37, 64, 0.6);
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: var(--space-5) var(--space-3);
+  padding: var(--space-6) var(--space-3);
   overflow-y: auto;
   z-index: 50;
 }
@@ -299,18 +420,19 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 .modal {
   background: var(--white);
   border-radius: var(--radius);
+  border-top: 4px solid var(--blue-600);
   width: 100%;
-  max-width: 520px;
-  padding: var(--space-5);
-  box-shadow: 0 8px 28px rgba(10, 37, 64, 0.4);
+  max-width: 540px;
+  padding: var(--space-5) var(--space-6) var(--space-6);
+  box-shadow: 0 16px 40px rgba(10, 37, 64, 0.4);
 }
-.modal h2 { margin: 0 0 var(--space-4); color: var(--blue-900); font-size: 18px; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3) var(--space-4); }
+.modal h2 { margin: 0 0 var(--space-5); font-family: var(--font-serif); color: var(--blue-900); font-size: 24px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
 .form-grid .full { grid-column: 1 / -1; }
 .form-grid .field { display: flex; flex-direction: column; }
 .form-grid label { font-size: 12px; font-weight: 600; color: var(--grey-700); margin-bottom: var(--space-1); }
 .form-grid .req { color: var(--red-600); }
-.form-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-4); }
+.form-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-5); }
 
 /* ==========================================================================
    TOASTS
@@ -328,23 +450,38 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 .toast {
   background: var(--blue-900);
   color: var(--white);
-  border-left: 5px solid var(--blue-300);
+  border-left: 4px solid var(--blue-300);
   border-radius: var(--radius);
   padding: var(--space-3) var(--space-4);
   box-shadow: 0 4px 14px rgba(10, 37, 64, 0.35);
 }
 .toast-warning { border-left-color: var(--amber-600); }
 
+@media (prefers-reduced-motion: reduce) {
+  .card, .btn { transition: none; }
+}
+
 /* ==========================================================================
-   RESPONSIVE — stack columns below 768px
+   RESPONSIVE
    ========================================================================== */
-@media (max-width: 767px) {
-  .board { flex-direction: column; padding: var(--space-3); }
+@media (max-width: 1099px) {
+  .dash-grid { grid-template-columns: 1fr 1fr; }
+  .dash-projects { grid-column: 1 / -1; grid-row: 2; border-left: 0; border-top: 1px solid var(--grey-200); }
+  .dash-due { grid-column: 2; grid-row: 1; }
+}
+@media (max-width: 899px) {
+  .board { flex-direction: column; padding: var(--space-4); }
   .column { width: 100%; flex: none; }
-  .app-header { padding: var(--space-3); }
-  .filters { padding: var(--space-3); }
-  .header-actions { align-items: flex-start; }
+  .app-header { padding: var(--space-4) var(--space-4) 96px; }
+  .dashboard { margin: -72px var(--space-3) 0; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .dash-projects, .dash-due { grid-column: auto; grid-row: auto; }
+  .dash-panel + .dash-panel { border-left: 0; border-top: 1px solid var(--grey-200); }
+  .filters { padding: var(--space-3) var(--space-4); }
+  .filters .btn { margin-left: 0; }
+  .demo-note { text-align: left; }
   .form-grid { grid-template-columns: 1fr; }
+  .modal { padding: var(--space-4); }
 }
 </style>
 </head>
@@ -352,13 +489,24 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
 
 <!-- ======================= HEADER + SUMMARY ======================= -->
 <header class="app-header">
-  <h1 class="wordmark">IT <span>PMO</span></h1>
-  <ul class="summary" id="summary" aria-label="Board summary"></ul>
-  <div class="header-actions">
-    <button type="button" class="btn" id="open-add">+ Add Task</button>
-    <span class="demo-note">Demo data only – refreshing the page resets the board.</span>
+  <div class="header-top">
+    <h1 class="wordmark">IT PMO<span class="wordmark-sub">Project board</span></h1>
+    <div class="header-actions">
+      <span class="demo-note">Demo data only. Refreshing the page resets the board.</span>
+      <button type="button" class="btn" id="open-add">+ Add task</button>
+    </div>
   </div>
 </header>
+
+<!-- ======================= PORTFOLIO DASHBOARD ======================= -->
+<section class="dashboard" aria-label="Portfolio status">
+  <div class="statement-head"><h2>Portfolio statement</h2><span id="as-at"></span></div>
+  <div class="dash-grid">
+    <div class="dash-panel dash-health" id="dash-health"></div>
+    <div class="dash-panel dash-projects" id="dash-projects"></div>
+    <div class="dash-panel dash-due" id="dash-due"></div>
+  </div>
+</section>
 
 <!-- ======================= FILTER BAR ======================= -->
 <section class="filters" aria-label="Filters">
@@ -535,6 +683,24 @@ function nextTaskId() {
 
 function slug(text) { return text.toLowerCase().replace(/\s+/g, "-"); }
 
+function initials(name) {
+  return name.trim().split(/\s+/).slice(0, 2).map(w => w.charAt(0).toUpperCase()).join("");
+}
+
+/** Whole days from today to an ISO date (negative when in the past). */
+function daysUntil(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  return Math.round((new Date(y, m - 1, d) - t) / 86400000);
+}
+
+function dueLabel(task) {
+  const n = daysUntil(task.dueDate);
+  if (n < 0) return Math.abs(n) + (n === -1 ? " day overdue" : " days overdue");
+  if (n === 0) return "Due today";
+  return n === 1 ? "Due tomorrow" : "Due in " + n + " days";
+}
+
 function findTask(id) { return state.tasks.find(t => t.id === id); }
 
 /* ==========================================================================
@@ -577,13 +743,80 @@ function applyFilters(tasks) {
   );
 }
 
-function renderSummary() {
-  const items = [{ label: "Total", value: state.tasks.length }]
-    .concat(STATUSES.map(s => ({ label: s, value: state.tasks.filter(t => t.status === s).length })))
-    .concat([{ label: "Overdue", value: state.tasks.filter(isOverdue).length, cls: "overdue-stat" }]);
-  document.getElementById("summary").innerHTML = items.map(i =>
-    '<li class="' + (i.cls || "") + '"><span class="num">' + i.value + '</span><span class="lbl">' + escapeHtml(i.label) + '</span></li>'
-  ).join("");
+const RING_R = 56;
+const RING_C = 2 * Math.PI * RING_R;
+
+function statusCounts(tasks) {
+  return STATUSES.map(s => ({ status: s, value: tasks.filter(t => t.status === s).length }));
+}
+
+function renderHealth() {
+  const tasks = state.tasks;
+  const total = tasks.length;
+  const open = tasks.filter(t => t.status !== "Done");
+  const attention = open.filter(t => t.status === "Blocked" || isOverdue(t)).length;
+  const ratio = open.length ? attention / open.length : 0;
+  const verdict = !attention ? ["On track", "ok"] : ratio < 0.25 ? ["Watch", "watch"] : ["At risk", "risk"];
+  const note = !total ? "No tasks on the board yet."
+    : !attention ? "Nothing open is overdue or blocked."
+    : attention + " of " + open.length + " open tasks are overdue or blocked.";
+
+  const counts = statusCounts(tasks);
+  let offset = 0;
+  const arcs = counts.filter(c => c.value).map(c => {
+    const gap = counts.filter(x => x.value).length > 1 ? 2 : 0;
+    const len = (c.value / total) * RING_C;
+    const arc = '<circle cx="74" cy="74" r="' + RING_R + '" style="stroke:var(--st-' + slug(c.status) + ')" ' +
+      'stroke-dasharray="' + Math.max(len - gap, 0) + ' ' + RING_C + '" stroke-dashoffset="' + (-offset) + '"></circle>';
+    offset += len;
+    return arc;
+  }).join("");
+  const done = counts[STATUSES.indexOf("Done")].value;
+  const pct = total ? Math.round(done / total * 100) : 0;
+
+  document.getElementById("dash-health").innerHTML =
+    '<h3>Overall status</h3>' +
+    '<p class="verdict verdict-' + verdict[1] + '">' + verdict[0] + '</p>' +
+    '<p class="verdict-note">' + escapeHtml(note) + '</p>' +
+    '<div class="ring-wrap"><svg class="ring" viewBox="0 0 148 148" aria-hidden="true">' +
+      '<circle class="ring-track" cx="74" cy="74" r="' + RING_R + '"></circle>' + arcs + '</svg>' +
+      '<div class="ring-center"><span class="ring-pct">' + pct + '%</span><span class="ring-cap">complete</span></div></div>' +
+    '<ul class="legend">' + counts.map(c =>
+      '<li><span class="swatch seg-' + slug(c.status) + '"></span>' + escapeHtml(c.status) + ' <b>' + c.value + '</b></li>').join("") + '</ul>';
+}
+
+function renderProjects() {
+  const rows = PROJECTS.map(name => {
+    const tasks = state.tasks.filter(t => t.project === name);
+    const overdue = tasks.filter(isOverdue).length;
+    const done = tasks.filter(t => t.status === "Done").length;
+    const bar = statusCounts(tasks).filter(c => c.value).map(c =>
+      '<span class="seg-' + slug(c.status) + '" style="flex-grow:' + c.value + '"></span>').join("");
+    return '<li class="' + (tasks.length ? "" : "ledger-idle") + '">' +
+      '<div class="ledger-line"><span class="ledger-name">' + escapeHtml(name) + '</span><span class="ledger-dots"></span>' +
+      (overdue ? '<span class="ledger-flag">' + overdue + ' overdue</span>' : '') +
+      '<span class="ledger-count">' + (tasks.length ? done + ' of ' + tasks.length + ' done' : 'No tasks') + '</span></div>' +
+      '<div class="ledger-bar">' + bar + '</div></li>';
+  }).join("");
+  document.getElementById("dash-projects").innerHTML = '<h3>Projects</h3><ul class="ledger">' + rows + '</ul>';
+}
+
+function renderDue() {
+  const next = state.tasks.filter(t => t.status !== "Done")
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 5);
+  document.getElementById("dash-due").innerHTML = '<h3>Due next</h3>' + (next.length
+    ? '<ul class="due-list">' + next.map(t =>
+        '<li><p class="due-title">' + escapeHtml(t.title) + '</p><div class="due-meta"><span>' +
+        escapeHtml(t.id) + ' / ' + escapeHtml(t.assignee) + '</span><span class="due-when' +
+        (isOverdue(t) ? ' is-overdue' : '') + '">' + escapeHtml(dueLabel(t)) + '</span></div></li>').join("") + '</ul>'
+    : '<p class="dash-empty">No open tasks. Add one to start tracking.</p>');
+}
+
+function renderDashboard() {
+  document.getElementById("as-at").textContent = "As at " + formatDate(isoDate(0)) + ", all projects";
+  renderHealth();
+  renderProjects();
+  renderDue();
 }
 
 /* ==========================================================================
@@ -602,25 +835,23 @@ function renderCard(task) {
         '<button type="button" class="btn-mini" data-action="delete-no" data-id="' + id + '">No</button></span>'
     : '<button type="button" class="icon-btn" data-action="delete" data-id="' + id + '" aria-label="Delete task ' + id + '">&times;</button>';
 
-  return '<article class="card prio-' + slug(task.priority) + '" draggable="true" data-id="' + id + '">' +
+  return '<article class="card" draggable="true" data-id="' + id + '">' +
     '<div class="card-top">' +
       '<span class="task-id">' + id + '</span>' +
       (isOverdue(task) ? '<span class="badge-overdue">Overdue</span>' : '') +
       '<span class="card-spacer"></span>' +
-      deleteControl +
+      '<span class="prio prio-' + slug(task.priority) + '">' + escapeHtml(task.priority) + '</span>' +
     '</div>' +
     '<h3 class="card-title">' + escapeHtml(task.title) + '</h3>' +
     '<p class="card-project">' + escapeHtml(task.project) + '</p>' +
-    '<div class="card-meta"><span>&#128100; ' + escapeHtml(task.assignee) + '</span>' +
-      '<span>Due ' + escapeHtml(formatDate(task.dueDate)) + '</span></div>' +
-    '<div class="card-tags">' +
-      '<span class="pill pill-' + slug(task.priority) + '">' + escapeHtml(task.priority) + '</span>' +
-      '<span class="tag">' + escapeHtml(task.category) + '</span>' +
-    '</div>' +
+    '<div class="card-meta"><span class="assignee"><span class="avatar" aria-hidden="true">' + escapeHtml(initials(task.assignee)) + '</span>' + escapeHtml(task.assignee) + '</span>' +
+      '<span class="due' + (isOverdue(task) ? ' is-overdue' : '') + '">Due ' + escapeHtml(formatDate(task.dueDate)) + '</span></div>' +
+    '<div class="card-tags"><span class="tag">' + escapeHtml(task.category) + '</span></div>' +
     '<div class="card-actions">' +
       '<select class="move-select" data-action="move" data-id="' + id + '" aria-label="Move ' + id + ' to another column">' +
-        '<option value="">Move &#9656;</option>' + moveOptions +
+        '<option value="">Move to</option>' + moveOptions +
       '</select>' +
+      deleteControl +
     '</div>' +
   '</article>';
 }
@@ -636,7 +867,7 @@ function renderBoard() {
       ? tasks.map(renderCard).join("")
       : '<p class="empty-note">No tasks</p>';
   });
-  renderSummary();
+  renderDashboard();
 }
 
 /* ==========================================================================

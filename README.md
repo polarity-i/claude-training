@@ -13,7 +13,8 @@ A single-file Kanban board for an IT PMO at a fictitious bank. It is an internal
 - Four columns: **Backlog**, **In Progress**, **Blocked**, **Done**
 - Add, move and delete tasks (move via drag and drop or the per-card "Move" menu; delete uses an inline Yes / No confirmation)
 - Filter by project, assignee and priority
-- Summary bar with task counts and an **Overdue** count, plus an overdue badge on late cards
+- **Portfolio statement** dashboard: an overall verdict (On track, Watch or At risk), a status ring with percent complete, a per-project ledger with status bars and overdue flags, and the next deadlines
+- Overdue badge and red due date on late cards
 - Email notification for each new task through [FormSubmit](https://formsubmit.co)
 
 ## Tech and constraints
